@@ -1,0 +1,46 @@
+name: Florida Car Wrap Lead Pipeline
+
+on:
+  schedule:
+    # 6:00 AM Eastern = 11:00 AM UTC (EST) / 10:00 AM UTC (EDT)
+    - cron: '0 11 * * 1-5'  # Mon-Fri only
+  workflow_dispatch:  # allows manual trigger from GitHub UI
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Restore seen phones cache
+        uses: actions/cache@v4
+        with:
+          path: seen_phones.json
+          key: seen-phones-${{ github.run_id }}
+          restore-keys: |
+            seen-phones-
+
+      - name: Run lead pipeline
+        env:
+          APIFY_API_TOKEN:      ${{ secrets.APIFY_API_TOKEN }}
+          JUSTCALL_API_KEY:     ${{ secrets.JUSTCALL_API_KEY }}
+          JUSTCALL_API_SECRET:  ${{ secrets.JUSTCALL_API_SECRET }}
+          JUSTCALL_CAMPAIGN_ID: ${{ secrets.JUSTCALL_CAMPAIGN_ID }}
+        run: python main.py
+
+      - name: Save updated seen phones
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: seen_phones.json
+          key: seen-phones-${{ github.run_id }}
