@@ -14,13 +14,34 @@ JUSTCALL_CAMPAIGN_ID = os.environ["JUSTCALL_CAMPAIGN_ID"]
 
 SEEN_FILE = "seen_phones.json"
 
+MIN_RATING       = 4.0   # Only include businesses with 4+ stars
+MIN_REVIEWS      = 3     # Must have at least 3 reviews
+
+FLORIDA_CITIES = [
+    "Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale",
+    "St Petersburg", "Hialeah", "Tallahassee", "Cape Coral", "Fort Myers",
+    "Pembroke Pines", "Hollywood", "Gainesville", "Miramar", "Coral Springs",
+    "Miami Gardens", "Clearwater", "Palm Bay", "Pompano Beach", "West Palm Beach",
+    "Lakeland", "Davie", "Miami Beach", "Boca Raton", "Deltona",
+    "Plantation", "Sunrise", "Palm Coast", "Deerfield Beach", "Melbourne",
+    "Boynton Beach", "Lauderhill", "Weston", "Kissimmee", "Homestead",
+    "Daytona Beach", "Delray Beach", "Tamarac", "Port St Lucie", "Pensacola",
+    "Ocala", "Sarasota", "Naples", "Fort Pierce", "Bradenton",
+    "Doral", "Sanford", "Margate", "Coral Gables", "Coconut Creek",
+]
+
+SEARCH_KEYWORDS = [
+    "car wrap",
+    "vehicle wrap",
+    "auto wrap",
+    "vinyl wrap",
+]
+
+# Build all city+keyword combos
 SEARCH_QUERIES = [
-    "car wrap Florida",
-    "vehicle wrap Florida",
-    "auto wrap Florida",
-    "car vinyl wrap Florida",
-    "fleet wrap Florida",
-    "car wrap shop Florida",
+    f"{keyword} {city}"
+    for city in FLORIDA_CITIES
+    for keyword in SEARCH_KEYWORDS
 ]
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -104,6 +125,17 @@ def process_leads(raw_results, seen_phones):
         if not phone:
             continue
         if phone in seen_phones or phone in session_phones:
+            continue
+
+        # Filter by rating & review count
+        rating       = item.get("totalScore") or item.get("rating") or 0
+        review_count = item.get("reviewsCount") or item.get("reviews") or 0
+        try:
+            if float(rating) < MIN_RATING:
+                continue
+            if int(review_count) < MIN_REVIEWS:
+                continue
+        except (ValueError, TypeError):
             continue
 
         # Basic Florida filter
