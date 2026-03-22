@@ -184,7 +184,7 @@ def upload_to_justcall(leads):
         return 0
 
     print(f"📤 Uploading {len(leads)} leads to JustCall...")
-    url = "https://api.justcall.io/v1/autodialer/campaign/addcontacts"
+    url = "https://api.justcall.io/v2/autodialer/campaigns/3163656/contacts"
     headers = {
         "Accept":        "application/json",
         "Content-Type":  "application/json",
