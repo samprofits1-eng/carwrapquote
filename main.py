@@ -142,8 +142,8 @@ def upload_to_justcall(leads):
     }
 
     # JustCall Sales Dialer: add contacts to campaign
-    # API docs: POST https://api.justcall.io/v1/autodialer/campaigns/addcontact
-    url = "https://api.justcall.io/v1/autodialer/campaigns/addcontact"
+    # API docs: POST https://api.justcall.io/v2.1/sales_dialer/campaigns/contact
+    url = "https://api.justcall.io/v2.1/sales_dialer/campaigns/contact"
 
     uploaded = 0
     failed = 0
