@@ -48,7 +48,8 @@ def clean_phone(phone):
 
 def run_apify_scrape():
     print("🔍 Starting Apify scrape...")
-    url = f"https://api.apify.com/v2/acts/{APIFY_ACTOR_ID}/runs?token={APIFY_API_TOKEN}"
+    actor_id_url = APIFY_ACTOR_ID.replace("/", "~")
+    url = f"https://api.apify.com/v2/acts/{actor_id_url}/runs?token={APIFY_API_TOKEN}"
     payload = {
         "searchStringsArray": SEARCH_QUERIES,
         "language": "en",
